@@ -122,7 +122,7 @@ class word_vector():
 
 #class_test
 if __name__=='__main__':
-	ds = split_word.doc_splitter('/home/lc/ht_work/ML/old_txt', '/home/lc/ht_work/ML/new_txt', None,'/home/lc/ht_work/ML/xw_parse/userdict.txt', True)
+	ds = split_word.doc_splitter('/home/lc/ht_work/ML/old_txt', '/home/lc/ht_work/ML/new_txt', '/home/lc/ht_work/xwparse/stopwords_merge.txt','/home/lc/ht_work/ML/xw_parse/userdict.txt', True)
 	ds.split_all()
 
 	#word_v = word_vector(line_generator('/home/lc/ht_work/ML/new_txt/'),None,True)
