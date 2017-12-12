@@ -11,9 +11,9 @@ from pathlib import Path
 import jieba
 
 class doc_splitter():
-	def __init__(self,srcdir,targetdir,stopword=None,userdict=None,parallel=True):
+	def __init__(self,srcdir,targetfile,stopword=None,userdict=None,parallel=True):
 		self.srcdir = srcdir
-		self.tagdir = targetdir
+		self.tagfile = targetfile
 
 		self.stopword = stopword  #dict
 		self.parallel = parallel
@@ -57,10 +57,11 @@ class doc_splitter():
 			return
 
 		print u'time: %s ==> 对文件%s进行分词\n' % (datetime.now(), filepath)
-		filepath_segmented = self.tagdir + os.path.sep + os.path.splitext(os.path.basename(filepath))[0] + '_segmented' + '.txt'
+		#filepath_segmented = self.tagdir + os.path.sep + os.path.splitext(os.path.basename(filepath))[0] + '_segmented' + '.txt'
+		filepath_segmented = self.tagfile
 
 		with open(filepath,'r') as fr:
-			with open(filepath_segmented,'w') as fw:
+			with open(filepath_segmented,'a') as fw:
 				line = fr.readline()
 				while line:
 					if line == '\r\n':
@@ -78,7 +79,7 @@ class doc_splitter():
 					fw.write(" ".join(out_str).strip().encode('utf-8') + '\n')  # 将分词好的结果写入到输出文件
 					line = fr.readline()
 
-		print u'time: %s ==> 文件%s分词结束，保存为%s\n' % (datetime.now(), filepath, filepath_segmented)
+		print u'time: %s ==> 文件%s分词结束，保存到%s\n' % (datetime.now(), filepath, filepath_segmented)
 		return filepath_segmented
 
 
@@ -93,6 +94,6 @@ class doc_splitter():
 
 #class test:
 if __name__=='__main__':
-	ds = doc_splitter('/home/lc/ht_work/ML/old_txt','/home/lc/ht_work/ML/new_txt',None,'/home/lc/ht_work/ML/xw_parse/userdict.txt',True)
+	ds = doc_splitter('/home/lc/ht_work/ML/old_txt','/home/lc/ht_work/ML/new_txt/allwords.txt',None,'/home/lc/ht_work/xwparse/userdict.txt',True)
 	ds.split_all()
 

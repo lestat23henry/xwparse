@@ -11,6 +11,7 @@ import numpy as np
 import os
 from multiprocessing import cpu_count
 from datetime import datetime
+import itertools
 
 import split_word
 
@@ -21,8 +22,14 @@ class line_generator():
 
 	def __iter__(self):
 		for fname in os.listdir(self.srcdir):
-			for line in open(os.path.join(self.srcdir, fname)):
-				yield line.split()
+			fullpath = os.path.join(self.srcdir,fname)
+			with w2v.utils.smart_open(fullpath) as fin:
+				for line in itertools.islice(fin, None):
+					wordline = line.split()
+					i = 0
+					while i < len(wordline):
+						yield line[i: i + 10000]
+						i += 10000
 
 
 class word_vector():
@@ -58,7 +65,10 @@ class word_vector():
 																																		 hierarch_sm, \
 																																		 negative_sample, \
 																																		 context_window, \
-																																		 word_min_count)
+																																		  word_min_count)
+		#self.model = w2v.Word2Vec(self.lines, size=50, sg=0, hs=1, negative=0, window=5,min_count=5, workers=cpu_num)
+		self.model = w2v.Word2Vec(w2v.LineSentence(self.lines), size=100, sg=0, hs=1, negative=1, window=5, min_count=5, workers=cpu_num)
+		'''
 		for fname in os.listdir(self.lines):
 			fullpath = os.path.join(self.lines, fname)
 			if first_flag:
@@ -70,7 +80,7 @@ class word_vector():
 				self.model.build_vocab(w2v.LineSentence(fullpath),update=True)
 				new_example_count = self.model.corpus_count - old_corpus_count
 				self.model.train(w2v.LineSentence(fullpath),total_examples=new_example_count,epochs=self.model.iter)
-
+		'''
 
 		print u'time: %s ==> 模型训练结束，使用%d核\n' % (datetime.now(), cpu_num)
 
@@ -122,11 +132,11 @@ class word_vector():
 
 #class_test
 if __name__=='__main__':
-	ds = split_word.doc_splitter('/home/lc/ht_work/ML/old_txt', '/home/lc/ht_work/ML/new_txt', '/home/lc/ht_work/xwparse/stopwords_merge.txt','/home/lc/ht_work/ML/xw_parse/userdict.txt', True)
+	ds = split_word.doc_splitter('/home/lc/ht_work/ML/old_txt', '/home/lc/ht_work/ML/new_txt/allwords.txt', '/home/lc/ht_work/xwparse/stopwords_merge.txt','/home/lc/ht_work/ML/xw_parse/userdict.txt', True)
 	ds.split_all()
 
 	#word_v = word_vector(line_generator('/home/lc/ht_work/ML/new_txt/'),None,True)
-	word_v = word_vector('/home/lc/ht_work/ML/new_txt/', None, True)
+	word_v = word_vector('/home/lc/ht_work/ML/new_txt/allwords.txt', None, True)
 	word_v.train_model()
 
 	word_v.model_test()
